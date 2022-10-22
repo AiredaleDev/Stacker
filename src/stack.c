@@ -4,25 +4,20 @@
 
 #include "stack.h"
 
-// Hardcrashing on OOM already? That's not suitable for kernel development or realtime applications!
+// Panic on allocation failure already? That's not suitable for kernel development or realtime applications!
 // I'll figure out a way around this somehow.
 
-void horth_stack_init(HorthStack* stack) {
-    stack = malloc(sizeof(HorthStack));
-    if (stack == NULL) {
-        fprintf(stderr, "Failed to allocate room for stack!\n");
-        exit(1);
-    }
-    
-    stack->cap = INITIAL_STACK_CAP;
+void horth_stack_init(HorthStack* stack) {    
     stack->top = 0;
-    stack->data = malloc(sizeof(HorthValue) * stack->cap);
+    stack->cap = INITIAL_STACK_CAP;
+    stack->data = calloc(stack->cap, sizeof(HorthValue));
     if (stack->data == NULL) {
         fprintf(stderr, "Failed to allocate room for stack's underlying array!\n");
         exit(1);
-    }
+    }    
 }
 
+// for subroutines? do they individually manage their own stacks?
 void horth_stack_deinit(HorthStack* stack) {
     if (stack != NULL) {
         if (stack->data != NULL) {
@@ -51,12 +46,26 @@ void horth_stack_push(HorthStack* stack, HorthValue value) {
         horth_stack_grow(stack);
     }
     
-    stack->data[++stack->top] = value;
+    stack->data[stack->top++] = value;
 }
 
 HorthValue horth_stack_pop(HorthStack* stack) {
     assert(stack != NULL);    
+    // uh yeah moron if you just blindly pop
+    // past the bottom of the stack you'll segfault
     return stack->data[stack->top--];
 }
 
 
+void horth_stack_print(HorthStack* stack) {
+    printf("[Size: %zu]", stack->top);
+    for (int i = 0; i <= stack->top; ++i) {
+        if (stack->data[i].type == SYMBOL) {
+            printf(" %s", stack->data[i].text);
+        }
+        if (stack->data[i].type == INTEGER) {
+            printf(" %ld", stack->data[i].integer);
+        }
+    }
+    puts("");
+}
