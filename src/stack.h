@@ -10,9 +10,6 @@ typedef enum {
     INTEGER,
 } HorthType;
 
-// Maybe we store a stack of "symbols"
-// Their meanings can be inferred at runtime?
-// We'll ignore text symbols for now and hardcode our arithmetic operations.
 typedef struct { 
     HorthType type;
     union {
@@ -32,6 +29,7 @@ void horth_stack_deinit(HorthStack*);
 void horth_stack_grow(HorthStack*);
 void horth_stack_push(HorthStack*, HorthValue);
 HorthValue horth_stack_pop(HorthStack*);
-void horth_stack_print(HorthStack*);
+void horth_stack_dump(HorthStack*);
+void horth_stack_print_top(HorthStack*);
 
 #endif

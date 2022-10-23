@@ -5,3 +5,4 @@ I want to understand this language inside and out, so I'm rolling my own. It's l
 
 Keeping in the spirit of Forth's flexibility and live-fixing, I want any stage of this compiler to be callable through the associated library. The executable should be nothing
 but a wrapper that does the whole process, making it effortless to build syntax highlighting, language servers, and other useful tools that improve developer experience.
+

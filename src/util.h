@@ -1,3 +1,5 @@
+// TODO: Program (and maybe stack) should use a bump allocator to be more performant.
+
 #ifndef _UTIL_H
 #define _UTIL_H
 

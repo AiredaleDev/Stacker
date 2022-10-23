@@ -2,4 +2,4 @@
 
 set -xe
 
-gcc src/*.c -Wall -Werror -lreadline -o horth
+gcc src/*.c -g -Wall -Werror -lreadline -o horth
