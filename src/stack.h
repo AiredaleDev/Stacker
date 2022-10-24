@@ -24,12 +24,12 @@ typedef struct {
     usize       cap;
 } Stack;
 
-void horth_stack_init(Stack*);
-void horth_stack_deinit(Stack*);
-void horth_stack_grow(Stack*);
-void horth_stack_push(Stack*, StackerValue);
-StackerValue horth_stack_pop(Stack*);
-void horth_stack_dump(Stack*);
-void horth_stack_print_top(Stack*);
+void stacker_stack_init(Stack*);
+void stacker_stack_deinit(Stack*);
+void stacker_stack_grow(Stack*);
+void stacker_stack_push(Stack*, StackerValue);
+StackerValue stacker_stack_pop(Stack*);
+void stacker_stack_dump(Stack*);
+void stacker_stack_print_top(Stack*);
 
 #endif

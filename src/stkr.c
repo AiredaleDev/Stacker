@@ -50,25 +50,31 @@ bool evaluate(Program* program, Stack* stack) {
     for (int pc = 0; pc < program->len; ++pc) {
         switch(program->instructions[pc].op) {
         case OP_PUSH: {
-            horth_stack_push(stack, program->instructions[pc].val);
+            stacker_stack_push(stack, program->instructions[pc].val);
         } break;
         case OP_DUP: {
-            horth_stack_push(stack, stack->data[stack->top - 1]);
+            stacker_stack_push(stack, stack->data[stack->top - 1]);
         } break;
         case OP_POP: {
-            horth_stack_pop(stack);
+            stacker_stack_pop(stack);
         } break;
         case OP_PEEK: {
-            horth_stack_print_top(stack);
+            stacker_stack_print_top(stack);
         } break;
         case OP_DUMP: {
-            horth_stack_dump(stack);
+            stacker_stack_dump(stack);
         } break;
         case OP_PLUS: {
-            StackerValue v2 = horth_stack_pop(stack);
-            StackerValue v1 = horth_stack_pop(stack);
+            StackerValue v2 = stacker_stack_pop(stack);
+            StackerValue v1 = stacker_stack_pop(stack);
             if (v1.type == INTEGER && v2.type == INTEGER) {
-                horth_stack_push(stack, (StackerValue){ .type = INTEGER, .integer = v1.integer + v2.integer });
+                stacker_stack_push(
+                    stack, 
+                    (StackerValue){ 
+                        .type = INTEGER, 
+                        .integer = v1.integer + v2.integer
+                    }
+                );
             } else {
                 // TODO: Tell the user *where* in the file the error is.
                 fprintf(stderr, "Type mismatch when adding!\n");
@@ -95,10 +101,10 @@ int main(int argc, char** argv) {
     puts("Type '?' to get some help, type 'bye' or ctrl-d to quit.");
     
     Program program;
-    horth_program_init(&program);
+    stacker_program_init(&program);
     
     Stack environment_stack;
-    horth_stack_init(&environment_stack);
+    stacker_stack_init(&environment_stack);
     assert(environment_stack.top == 0);
     
     while (true) {
@@ -114,7 +120,7 @@ int main(int argc, char** argv) {
                 break;
             }
             StackerInst inst = parse_inst(token);
-            horth_program_append_instruction(&program, inst);
+            stacker_program_append_instruction(&program, inst);
 
             token = strtok(NULL, " ");
         }
@@ -126,11 +132,11 @@ int main(int argc, char** argv) {
         }
         
         // FIXME: This bad boi frees memory readline still needs?
-        // horth_program_clear(&program);
+        // stacker_program_clear(&program);
 
         // This is semantically equivalent (and works!) but is more wasteful of existing allocations.
-        horth_program_deinit(&program);
-        horth_program_init(&program);
+        stacker_program_deinit(&program);
+        stacker_program_init(&program);
     }
     
     puts("Goodbye!");

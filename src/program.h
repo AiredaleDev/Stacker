@@ -19,6 +19,7 @@ typedef enum {
     OP_PLUS,
     OP_MINUS,
     OP_IF,
+    OP_END,
 } StackOp;
 
 // This really feels like making the same data structure
@@ -39,11 +40,11 @@ typedef struct {
     usize      cap;
 } Program;
 
-void horth_program_init(Program*);
-void horth_program_deinit(Program*);
-void horth_program_grow(Program*);
-void horth_program_clear(Program*);
-void horth_program_append_instruction(Program*, StackerInst);
-void horth_program_append_instructions(Program*, StackerInst*, usize);
+void stacker_program_init(Program*);
+void stacker_program_deinit(Program*);
+void stacker_program_grow(Program*);
+void stacker_program_clear(Program*);
+void stacker_program_append_instruction(Program*, StackerInst);
+void stacker_program_append_instructions(Program*, StackerInst*, usize);
 
 #endif
