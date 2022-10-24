@@ -8,28 +8,28 @@
 typedef enum {
     SYMBOL,
     INTEGER,
-} HorthType;
+} StackerType;
 
 typedef struct { 
-    HorthType type;
+    StackerType type;
     union {
         char* text;
         iptr  integer;
     };
-} HorthValue;
+} StackerValue;
 
 typedef struct {
-    HorthValue* data;
+    StackerValue* data;
     usize       top;
     usize       cap;
-} HorthStack;
+} Stack;
 
-void horth_stack_init(HorthStack*);
-void horth_stack_deinit(HorthStack*);
-void horth_stack_grow(HorthStack*);
-void horth_stack_push(HorthStack*, HorthValue);
-HorthValue horth_stack_pop(HorthStack*);
-void horth_stack_dump(HorthStack*);
-void horth_stack_print_top(HorthStack*);
+void horth_stack_init(Stack*);
+void horth_stack_deinit(Stack*);
+void horth_stack_grow(Stack*);
+void horth_stack_push(Stack*, StackerValue);
+StackerValue horth_stack_pop(Stack*);
+void horth_stack_dump(Stack*);
+void horth_stack_print_top(Stack*);
 
 #endif

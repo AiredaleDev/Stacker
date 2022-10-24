@@ -17,22 +17,24 @@ typedef enum {
     OP_PEEK,
     OP_DUMP,
     OP_PLUS,
-} HorthOp;
+    OP_MINUS,
+    OP_IF,
+} StackOp;
 
 // This really feels like making the same data structure
 // again... I wonder if there's any way I can deduplicate
 // some of my code
 typedef struct {
-    HorthOp    op;
-    HorthValue val; // Optional. Will only be used for push... A bit wasteful to have this commonly used data structure
+    StackOp    op;
+    StackerValue val; // Optional. Will only be used for push... A bit wasteful to have this commonly used data structure
     // fill my cache line with a bunch of zeroes...
-} HorthInst;
+} StackerInst;
 
 // A program is just a list of operations.
 // Dare I say, a STACK of operations?
 // Well, we'll see about that.
 typedef struct {
-    HorthInst* instructions;
+    StackerInst* instructions;
     usize      len;
     usize      cap;
 } Program;
@@ -41,7 +43,7 @@ void horth_program_init(Program*);
 void horth_program_deinit(Program*);
 void horth_program_grow(Program*);
 void horth_program_clear(Program*);
-void horth_program_append_instruction(Program*, HorthInst);
-void horth_program_append_instructions(Program*, HorthInst*, usize);
+void horth_program_append_instruction(Program*, StackerInst);
+void horth_program_append_instructions(Program*, StackerInst*, usize);
 
 #endif

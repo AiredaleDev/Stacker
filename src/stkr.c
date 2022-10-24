@@ -11,10 +11,10 @@
 #define MAX_TOKEN_NAME_LEN 256
 
 // TODO: Make me parse instructions, not stack values.
-HorthInst parse_inst(char* str) {
+StackerInst parse_inst(char* str) {
     assert(str != NULL);
 
-    HorthInst inst = {0};
+    StackerInst inst = {0};
     if (strcmp(str, "+") == 0) {
         inst.op = OP_PLUS;
     } else if (strcmp(str, ".") == 0) {
@@ -26,12 +26,11 @@ HorthInst parse_inst(char* str) {
     } else if (strcmp(str, ".s") == 0) {
         inst.op = OP_DUMP;
     } else { // any old thing: push value onto stack
-        HorthValue val = {0};
+        StackerValue val = {0};
         int v = atoi(str);
         // FIXME: Need to properly check that parsing failed.
+        // Parser failure => it's a symbol name.
         if (v == 0 && str[0] != '0') {
-            // Parser failure => Fuck it, it's a symbol name.
-            // Also not very robust, but I just want to see that I can get things evaluating.
             val.type = SYMBOL;
             val.text = strndup(str, MAX_TOKEN_NAME_LEN);
         } else {
@@ -47,7 +46,7 @@ HorthInst parse_inst(char* str) {
 
 // Run a horth program. So far just returns whether or not it had a problem,
 // not necessarily which one.
-bool evaluate(Program* program, HorthStack* stack) {
+bool evaluate(Program* program, Stack* stack) {
     for (int pc = 0; pc < program->len; ++pc) {
         switch(program->instructions[pc].op) {
         case OP_PUSH: {
@@ -66,11 +65,12 @@ bool evaluate(Program* program, HorthStack* stack) {
             horth_stack_dump(stack);
         } break;
         case OP_PLUS: {
-            HorthValue v2 = horth_stack_pop(stack);
-            HorthValue v1 = horth_stack_pop(stack);
+            StackerValue v2 = horth_stack_pop(stack);
+            StackerValue v1 = horth_stack_pop(stack);
             if (v1.type == INTEGER && v2.type == INTEGER) {
-                horth_stack_push(stack, (HorthValue){ .type = INTEGER, .integer = v1.integer + v2.integer });
+                horth_stack_push(stack, (StackerValue){ .type = INTEGER, .integer = v1.integer + v2.integer });
             } else {
+                // TODO: Tell the user *where* in the file the error is.
                 fprintf(stderr, "Type mismatch when adding!\n");
                 return false;
             }
@@ -97,13 +97,11 @@ int main(int argc, char** argv) {
     Program program;
     horth_program_init(&program);
     
-    HorthStack environment_stack;
+    Stack environment_stack;
     horth_stack_init(&environment_stack);
     assert(environment_stack.top == 0);
     
     while (true) {
-        // ??? why the fuck
-        // gnu readline has betrayed me
         char* line = readline("> ");
         if (line == NULL || strcmp(line, "bye") == 0) {
             break;
@@ -115,7 +113,7 @@ int main(int argc, char** argv) {
             if (token[0] == '\\') { // ok comment time
                 break;
             }
-            HorthInst inst = parse_inst(token);
+            StackerInst inst = parse_inst(token);
             horth_program_append_instruction(&program, inst);
 
             token = strtok(NULL, " ");
@@ -129,6 +127,10 @@ int main(int argc, char** argv) {
         
         // FIXME: This bad boi frees memory readline still needs?
         // horth_program_clear(&program);
+
+        // This is semantically equivalent (and works!) but is more wasteful of existing allocations.
+        horth_program_deinit(&program);
+        horth_program_init(&program);
     }
     
     puts("Goodbye!");

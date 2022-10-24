@@ -8,7 +8,7 @@
 void horth_program_init(Program* program) {
     program->len = 0;
     program->cap = INITIAL_PROGRAM_CAP;
-    program->instructions = calloc(program->cap, sizeof(HorthOp));
+    program->instructions = calloc(program->cap, sizeof(StackOp));
     if (program->instructions == NULL) {
         fprintf(stderr, "Failed to allocate space for program!\n");
         exit(1);
@@ -16,23 +16,22 @@ void horth_program_init(Program* program) {
 }
 
 void horth_program_deinit(Program* program) {
+    // We don't assume you necessarily allocated the program in question using malloc.
     if (program) {
         if (program->instructions) {
             free(program->instructions);
         }
-        free(program);
     }
 }
 
-// easily avoid syscalls and reuse allocations
 // I think what I want is a bump allocator and not malloc.
 void horth_program_clear(Program* program) {
     program->len = 0;
-    // are you part of the problem?
-    memset(program->instructions, 0, program->cap * sizeof(HorthInst));
+    // FIXME: This fucker frees memory that readline uses??? 
+    memset(program->instructions, 0, program->cap * sizeof(StackerInst));
 }
 
-void horth_program_append_instruction(Program* program, HorthInst inst) {
+void horth_program_append_instruction(Program* program, StackerInst inst) {
     if (program->len == program->cap) {
         horth_program_grow(program);
     }
@@ -43,7 +42,7 @@ void horth_program_append_instruction(Program* program, HorthInst inst) {
 // Generally speaking we're going to opt to use this one in the interpreter.
 // When I get to compiling stuff, I (theoretically) am going to be able to inspect the number of instructions
 // in the file and allocate room for exactly that many. If I need more room for macros/runtime-fixing, then I will just grow accordingly.
-void horth_program_append_instructions(Program* program, HorthInst* insts, usize nemb) {
+void horth_program_append_instructions(Program* program, StackerInst* insts, usize nemb) {
     // This bad boi is O(1) amortized. You'd have to feed this guy a massive program in the interpreter.
     // in order to run 
     while (program->cap < program->len + nemb) {
@@ -57,5 +56,5 @@ void horth_program_append_instructions(Program* program, HorthInst* insts, usize
 
 void horth_program_grow(Program* program) {
     program->cap *= 2;
-    program->instructions = reallocarray(program->instructions, program->cap, sizeof(HorthInst));
+    program->instructions = reallocarray(program->instructions, program->cap, sizeof(StackerInst));
 }
