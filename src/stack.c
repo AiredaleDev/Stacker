@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "util.h"
 #include "stack.h"
 #define DEBUG 0
 
@@ -13,8 +14,7 @@ void stacker_stack_init(Stack* stack) {
     stack->cap = INITIAL_STACK_CAP;
     stack->data = calloc(stack->cap, sizeof(StackerValue));
     if (stack->data == NULL) {
-        fprintf(stderr, "Failed to allocate room for stack's underlying array!\n");
-        exit(1);
+        die("Failed to allocate room for stack's underlying array!");
     }    
 }
 
@@ -33,10 +33,8 @@ void stacker_stack_grow(Stack* stack) {
     
     stack->cap *= 2;
     stack->data = reallocarray(stack->data, stack->cap, sizeof(StackerValue));
-    // TODO: read realloc's docs to see if this is how it handles allocation failure
     if (stack->data == NULL) {
-        fprintf(stderr, "Failed to expand stack!\n");
-        exit(1);
+        die("Failed to expand stack!");
     }
 }
 
@@ -69,9 +67,11 @@ void stacker_stack_push(Stack* stack, StackerValue value) {
 
 StackerValue stacker_stack_pop(Stack* stack) {
     assert(stack != NULL);    
-    // uh yeah moron if you just blindly pop
-    // past the bottom of the stack you'll segfault
-    return stack->data[--stack->top];
+    if (stack->top != 0) {
+        return stack->data[--stack->top];
+    } else {
+        return NIL_VALUE; // Returns "NIL"
+    }
 }
 
 static void stacker_stack_print_val(Stack* stack, usize i) {

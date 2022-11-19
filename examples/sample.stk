@@ -8,7 +8,6 @@
 =
 .
 
-
 \ Pushes x onto the stack.
 \ Then, we operate on our stack all the same.
 double x proc

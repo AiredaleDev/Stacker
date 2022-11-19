@@ -56,5 +56,13 @@ void stacker_program_append_instructions(Program* program, StackerInst* insts, u
 
 void stacker_program_grow(Program* program) {
     program->cap *= 2;
-    program->instructions = reallocarray(program->instructions, program->cap, sizeof(StackerInst));
+    {   
+        StackerInst* tmp;
+        if ((tmp = reallocarray(program->instructions, program->cap, sizeof(StackerInst))) != NULL) {         
+            program->instructions = tmp;
+        } else {
+            fprintf(stderr, "Failed to expand program!\n");
+            exit(1);
+        }
+    }
 }

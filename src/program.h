@@ -9,16 +9,26 @@
 #define INITIAL_PROGRAM_CAP 1024
 
 // Planned for the near future:
-// minus, times, div, mod, if, proc...
+// proc, macro (forth can swap between "compile" and "interpret" modes at runtime)
+// Ideally I'd like many of these to be written in the language itself down the line.
 typedef enum {
+    // Stack operations
     OP_PUSH,
     OP_POP,
     OP_DUP,
     OP_PEEK,
     OP_DUMP,
+    // Arithmetic
     OP_PLUS,
     OP_MINUS,
+    OP_MUL,
+    OP_DIV,
+    OP_MOD,
+    // Comparisons
+    OP_EQ,
+    // Control flow
     OP_IF,
+    OP_ELSE,
     OP_END,
 } StackOp;
 
@@ -26,9 +36,8 @@ typedef enum {
 // again... I wonder if there's any way I can deduplicate
 // some of my code
 typedef struct {
-    StackOp    op;
-    StackerValue val; // Optional. Will only be used for push... A bit wasteful to have this commonly used data structure
-    // fill my cache line with a bunch of zeroes...
+    StackOp      op;
+    StackerValue val;
 } StackerInst;
 
 // A program is just a list of operations.
@@ -36,8 +45,8 @@ typedef struct {
 // Well, we'll see about that.
 typedef struct {
     StackerInst* instructions;
-    usize      len;
-    usize      cap;
+    usize        len;
+    usize        cap;
 } Program;
 
 void stacker_program_init(Program*);
